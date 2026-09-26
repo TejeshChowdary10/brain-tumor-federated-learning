@@ -1,20 +1,21 @@
 # Brain Tumor Segmentation via Federated Learning
 
-> **Enhancing Brain Tumor Segmentation through Federated Learning under Non-IID Constraints**  
+> **Enhancing Brain Tumor Segmentation through Federated Learning under Non-IID Constraints**
 > Department of Computer Science and Engineering, Amrita Vishwa Vidyapeetham, Bengaluru
 
 ---
 
 ## Overview
 
-This project implements a **Federated Learning (FL)** pipeline for brain MRI tumor segmentation, tackling the challenge of training across **non-IID distributed datasets** while preserving patient data privacy. It compares two FL aggregation strategies â€” FedAvg and FedAdagrad â€” under varying non-IID data distributions controlled by a Dirichlet concentration parameter (Î±).
+This project implements a **Federated Learning (FL)** pipeline for brain MRI tumor segmentation, tackling the challenge of training across **non-IID distributed datasets** while preserving patient data privacy. It compares two FL aggregation strategies -- FedAvg and FedAdagrad -- under varying non-IID data distributions controlled by a Dirichlet concentration parameter (alpha).
 
 ### Key Contributions
+
 - Custom **U-Net with VGG16 encoder** and **CBAM (Convolutional Block Attention Module)** attention blocks
 - Custom **Dice + Binary Cross-Entropy** combined loss function
-- Comparison of **FedAvg** and **FedAdagrad** aggregation under Î± âˆˆ {0.5, 1.0, 5.0}
+- Comparison of **FedAvg** and **FedAdagrad** aggregation under alpha values of 0.5, 1.0, and 5.0
 - 3 simulated clients with Dirichlet-sampled non-IID splits: 981 / 1359 / 724 samples
-- 10 FL rounds Ã— 15 local epochs per round
+- 10 FL rounds x 15 local epochs per round
 - Evaluation using **Mean IoU** and **Dice Score**
 
 ---
@@ -22,28 +23,30 @@ This project implements a **Federated Learning (FL)** pipeline for brain MRI tum
 ## Architecture
 
 ```
-Client 1 (981 samples)  â”€â”€â”
-Client 2 (1359 samples) â”€â”€â”¤â”€â”€â–º FL Server (FedAvg / FedAdagrad) â”€â”€â–º Global Model
-Client 3 (724 samples)  â”€â”€â”˜
+Client 1 (981 samples)  --+
+Client 2 (1359 samples) --+--> FL Server (FedAvg / FedAdagrad) --> Global Model
+Client 3 (724 samples)  --+
 
 Per client:
-  MRI Input â†’ VGG16 Encoder â†’ Skip Connections â†’ CBAM Attention â†’ U-Net Decoder â†’ Segmentation Mask
+  MRI Input -> VGG16 Encoder -> Skip Connections -> CBAM Attention -> U-Net Decoder -> Segmentation Mask
 ```
 
 **Model components:**
+
 | Component | Details |
 |---|---|
 | Encoder | VGG16 (pretrained on ImageNet, fine-tuned) |
-| Attention | CBAM â€” channel attention + spatial attention |
+| Attention | CBAM -- channel attention + spatial attention |
 | Decoder | U-Net transposed convolutions with skip connections |
-| Loss | 0.5 Ã— Dice Loss + 0.5 Ã— Binary Cross-Entropy |
+| Loss | 0.5 x Dice Loss + 0.5 x Binary Cross-Entropy |
 | Optimizer | Adam (lr=1e-4) |
 
 ---
 
 ## Dataset
 
-**Brain Tumor Segmentation Dataset** â€” available on Kaggle  
+**Brain Tumor Segmentation Dataset** -- available on Kaggle
+
 - MRI images + binary segmentation masks
 - 3064 total samples split across 3 federated clients
 - Download: `kaggle datasets download -d navoneel/brain-mri-images-for-brain-tumor-detection`
@@ -52,7 +55,7 @@ Per client:
 
 ## Experiments
 
-| Notebook | FL Strategy | Non-IID Î± | Description |
+| Notebook | FL Strategy | Non-IID Alpha | Description |
 |---|---|---|---|
 | `Fedavg_0.5&1.ipynb` | FedAvg | 0.5, 1.0 | High and medium non-IID |
 | `Fedavg_5.ipynb` | FedAvg | 5.0 | Near-IID distribution |
@@ -74,16 +77,17 @@ Python 3.8+, TensorFlow 2.x recommended.
 
 ## Key Concepts
 
-- **Federated Learning** â€” decentralised model training without sharing raw data
-- **Non-IID data** â€” real-world medical data is non-independently and identically distributed across hospitals
-- **Dirichlet distribution** â€” controls the degree of data heterogeneity across clients (lower Î± = more non-IID)
-- **CBAM** â€” attention mechanism that reweights feature maps channel-wise and spatially
-- **FedAvg** â€” weighted average of client model weights (McMahan et al., 2017)
-- **FedAdagrad** â€” adaptive gradient-based federated aggregation
+- **Federated Learning** -- decentralised model training without sharing raw data
+- **Non-IID data** -- real-world medical data is non-independently and identically distributed across hospitals
+- **Dirichlet distribution** -- controls the degree of data heterogeneity across clients (lower alpha = more non-IID)
+- **CBAM** -- attention mechanism that reweights feature maps channel-wise and spatially
+- **FedAvg** -- weighted average of client model weights (McMahan et al., 2017)
+- **FedAdagrad** -- adaptive gradient-based federated aggregation
 
 ---
 
 ## Authors
 
-Geda Tejesh Chowdary Â· Paramkusam Sriharsha Â· Yelipe Gowtham  
+Geda Tejesh Chowdary | Paramkusam Sriharsha | Yelipe Gowtham
+
 Amrita Vishwa Vidyapeetham, Bengaluru
